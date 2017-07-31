@@ -7,7 +7,8 @@ using UnityEngine.UI;
 public class FPSDisplay : MonoBehaviour {
 
 
-    public Text fpsLabel;
+    public Text highestFPSLabel, averageFPSLabel, lowestFPSLabel;
+
 
 
     //This is to save memory, instead of creating a new FPS string every frame - and deleting it later - it reuses
@@ -25,6 +26,18 @@ public class FPSDisplay : MonoBehaviour {
         "90", "91", "92", "93", "94", "95", "96", "97", "98", "99"
     };
 
+    //Serializable exposes it in the unity editor
+    //this is a definition of an object
+    [System.Serializable]
+    private struct FPSColor
+    {
+        public Color color;
+        public int minimunFPS;
+    }
+
+    //this is the instance of the struct object defined above
+    [SerializeField]
+    private FPSColor[] coloring;
 
     FPSCounter fpsCounter;
 
@@ -38,9 +51,27 @@ public class FPSDisplay : MonoBehaviour {
     void Start () {
 		
 	}
-	
-	// Update is called once per frame
-	void Update () {
-        fpsLabel.text = stringsFrom00To99[Mathf.Clamp(fpsCounter.FPS, 0, 99)];
-	}
+
+    // Update is called once per frame
+    void Update()
+    {
+        Display(highestFPSLabel, fpsCounter.HighestFPS);
+        Display(averageFPSLabel, fpsCounter.AverageFPS);
+        Display(lowestFPSLabel, fpsCounter.LowestFPS);
+    }
+
+
+    void Display(Text label, int fps)
+    {
+        label.text = stringsFrom00To99[Mathf.Clamp(fps, 0, 99)];
+        for (int i = 0; i < coloring.Length; i++)
+        {
+            if (fps >= coloring[i].minimunFPS)
+            {
+                label.color = coloring[i].color;
+                break;
+            }
+        }
+    }
+
 }
